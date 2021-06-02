@@ -41,7 +41,6 @@ def yes_no(question):
             print("<error> Unknown Answer "
                   "Detected. Please Input Yes/No")
 
-
 def num_check(question, num_type, error, low=None, high=None, exit_code=None):
 
     valid = False
