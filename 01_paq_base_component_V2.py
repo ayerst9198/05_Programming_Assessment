@@ -8,9 +8,10 @@ def instructions():
     print()
     print("This is a randomly generated math quiz.")
     print()
-    print("There are 3 difficulties:")
+    print("There are 4 difficulties:")
     print("-easy (1)")
     print("-medium (2)")
+    print("-hard (3)")
     print("-nightmare (3) *The calculator cannot save you, The decimals are too long.")
     print()
     print("Try to answer as many questions as possible.")
@@ -48,6 +49,8 @@ def quiz_difficulty(question, error):
             return response
         elif response == "medium":
             return response
+        elif response == "hard":
+            return response
         elif response == "nightmare":
             return response
         if response == "1":
@@ -57,6 +60,9 @@ def quiz_difficulty(question, error):
             response = "medium"
             return response
         elif response == "3":
+            response = "hard"
+            return response
+        elif response == "4":
             response = "nightmare"
             return response
         else:
@@ -132,6 +138,7 @@ def num_check(question, num_type, error, low=None, high=None, exit_code=None):
 # randomly generated operatives, depending on which mode user is playing
 easy_questions = ["+", "-"]
 medium_questions = ["*"]
+hard_questions = ["*", "/"]
 nightmare_questions = ["/", "**"]
 play_again = "yes"
 
@@ -153,18 +160,19 @@ while play_again == "yes":
 
     # keeps track of points
     points = 0
+    max_points = 0
 
     # asks user for a difficulty
-    difficulty = quiz_difficulty("What difficulty do you want to use? ", "Please enter 1 (easy), 2 (medium), or 3 (nightmare)")
+    difficulty = quiz_difficulty("What difficulty do you want to use? easy (1), medium (2), hard (3), nightmare (4) ", "Please enter 1 (easy), 2 (medium), 3 (hard), or 4 (nightmare)")
     print()
 
     # decides how many rounds you can play
-    rounds = num_check("How many rounds do you want to play? ", int, "Please enter an int above 0", 1)
+    rounds = num_check("How many questions do you want to answer? ", int, "Please enter an int above 0", 1)
     print()
 
     # loops untill user has played all rounds
     while rounds + 1 != rounds_played:
-        statement_generator("Round: {}".format(rounds_played), "*" ,"*")
+        statement_generator("Question: {}".format(rounds_played), "*" ,"*")
 
         # randomly generates integers for math questions
         if difficulty == "easy":
@@ -178,9 +186,13 @@ while play_again == "yes":
             rand = random.randint(1,10)
             rand2 = random.randint(1,10)
             operation = random.choice(medium_questions)
+        
+        elif difficulty == "hard":
+            rand = random.randint(-10,10)
+            rand2 = random.randint(1,10)
+            operation = random.choice(hard_questions)
 
         if difficulty == "nightmare":
-
             rand = random.randint(1,100)
             rand2 = random.randint(1,30)
             operation = random.choice(nightmare_questions)
@@ -188,17 +200,29 @@ while play_again == "yes":
         # generates ans using the randomly generated stuff above
         ans = eval(str(rand) + operation + str(rand2))
 
+        if operation == "*":
+            operation = "x"
+        elif operation == "**":
+            operation = "^"
+
         # prints answer for testing
         print("ans: {}".format(ans))
         print()
         user_ans = num_check("What is {} {} {}? ".format(rand, operation ,rand2), float, "Please enter an integer", None, None, exit_code = "xxx")
+        
         print()
 
         # compares users answer to ans
-        if user_ans == ans:
+        if user_ans == "xxx":
+            statement_generator("You Quit", "|", "*")
+            print()
+            break
+
+        elif user_ans == ans:
             print("You got it right")
             print()
             points += 100
+        
         else:
             print("WRONG")
             print()
@@ -206,9 +230,10 @@ while play_again == "yes":
             print()
             points -= 10
         rounds_played += 1
+        max_points += 100
 
     # shows final score
-    statement_generator("Final Score: {}".format(points), "|", "*")
+    statement_generator("Final Score: {} / {}".format(points, max_points), "|", "*")
     print()
 
     # asks user if they want to play again

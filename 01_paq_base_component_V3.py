@@ -1,4 +1,4 @@
-import random
+import random                                 
 
 # Functions go here
 
@@ -8,10 +8,11 @@ def instructions():
     print()
     print("This is a randomly generated math quiz.")
     print()
-    print("There are 3 difficulties:")
-    print("-easy (1)")
-    print("-medium (2)")
-    print("-nightmare (3) *The calculator cannot save you, The decimals are too long.")
+    print("There are 4 difficulties:")
+    print("-easy (e)")
+    print("-medium (m)")
+    print("-hard (h). Divisions in hard mode are rounded to nearest whole number.")
+    print("-nightmare (n) *The calculator cannot save you, The decimals are too long.")
     print()
     print("Try to answer as many questions as possible.")
     print("Every correct answer gets you 100 points,")
@@ -40,28 +41,24 @@ def yes_no(question):
                   "Detected. Please Input Yes/No")
 
 # allows the user to choose a difficulty
-def quiz_difficulty(question, error):
+def quiz_difficulty(question, valid_list, error):
     valid = False
     while not valid:
-        response = input(question)
-        if response == "easy":
-            return response
-        elif response == "medium":
-            return response
-        elif response == "nightmare":
-            return response
-        if response == "1":
-            response = "easy"
-            return response
-        elif response == "2":
-            response = "medium"
-            return response
-        elif response == "3":
-            response = "nightmare"
-            return response
-        else:
-            print(error)
-            continue
+
+        # Ask user for choice (and put choice in lowercase)
+        response = input(question).lower()
+
+        # iterates through list and if response is an item
+        # in the list (or the first letter of an iten), the
+        # full item name is returned
+
+        for item in valid_list:
+            if response == item[0] or response == item:
+                return item
+
+        # output error if item not in list
+        print(error)
+        print()
 
 # makes things look good
 def statement_generator(statement, side_decoration, top_bottom_decoration):
@@ -126,21 +123,25 @@ def num_check(question, num_type, error, low=None, high=None, exit_code=None):
             print(error)
             print()
 
-
 # Main routine goes here
 
 # randomly generated operatives, depending on which mode user is playing
 easy_questions = ["+", "-"]
 medium_questions = ["*"]
+hard_questions = ["*", "/"]
 nightmare_questions = ["/", "**"]
+
+# loops code
 play_again = "yes"
 
+
+difficulty_options = ["easy", "e", "medium", "", "hard", "h", "nightmare", "n"]
 # Welcomes users to the game
 statement_generator("Welcome to the Math Quiz", "|", "-")
 print()
 
 # asks user if they have played before for instructions
-show_instructions = yes_no("Have you played my game before? ")
+show_instructions = yes_no("Have you used this quiz before? ")
 print()
 if show_instructions == "no":
     instructions()
@@ -153,52 +154,80 @@ while play_again == "yes":
 
     # keeps track of points
     points = 0
+    max_points = 0
 
     # asks user for a difficulty
-    difficulty = quiz_difficulty("What difficulty do you want to use? ", "Please enter 1 (easy), 2 (medium), or 3 (nightmare)")
+    difficulty = quiz_difficulty("What difficulty do you want to use? easy (e), medium (m), hard (h), nightmare (n) ", difficulty_options, "please enter easy (e), medium (m), hard (h), nightmare (n) ")
     print()
 
     # decides how many rounds you can play
-    rounds = num_check("How many rounds do you want to play? ", int, "Please enter an int above 0", 1)
+    rounds = num_check("How many questions do you want to answer? ", int, "Please enter an int above 0", 1)
     print()
 
     # loops untill user has played all rounds
     while rounds + 1 != rounds_played:
-        statement_generator("Round: {}".format(rounds_played), "*" ,"*")
+        statement_generator("Question: {}".format(rounds_played), "*" ,"*")
 
         # randomly generates integers for math questions
-        if difficulty == "easy":
-
+        if difficulty == "easy" or difficulty == "medium" or difficulty == "hard" or difficulty == "nightmare":
             rand = random.randint(1,10)
             rand2 = random.randint(1,10)
-            operation = random.choice(easy_questions)
 
-        elif difficulty == "medium":
+            if difficulty == "easy":
+                operation = random.choice(easy_questions)
+                if operation == "-":
+                    temp_num = random.randint(1, 10)
+                    rand = rand2 + temp_num
+                else:
+                    rand = random.randint(1,10)
+                    rand2 = random.randint(1,10)
 
-            rand = random.randint(1,10)
-            rand2 = random.randint(1,10)
-            operation = random.choice(medium_questions)
+            elif difficulty == "medium":
+                operation = random.choice(medium_questions)
 
-        if difficulty == "nightmare":
+            elif operation == "hard":
+                operation = random.choice(hard_questions)
 
-            rand = random.randint(1,100)
-            rand2 = random.randint(1,30)
-            operation = random.choice(nightmare_questions)
+                if operation == "/":
+                    rand2 = random.randint(1,10)
+                    temp_num = random.randint(1,10)
+                    rand = rand2 * temp_num
+                    
+                else:
+                    rand = random.randint(-10,10)
+                    rand2 = random.randint(1,10)
+            else:
+                rand = random.randint(1,100)
+                rand2 = random.randint(1,30)
+                operation = random.choice(nightmare_questions)
 
         # generates ans using the randomly generated stuff above
         ans = eval(str(rand) + operation + str(rand2))
+
+        if operation == "*":
+            operation = "x"
+        elif operation == "**":
+            operation = "^"
+
 
         # prints answer for testing
         print("ans: {}".format(ans))
         print()
         user_ans = num_check("What is {} {} {}? ".format(rand, operation ,rand2), float, "Please enter an integer", None, None, exit_code = "xxx")
+        
         print()
 
         # compares users answer to ans
-        if user_ans == ans:
+        if user_ans == "xxx":
+            statement_generator("You Quit", "|", "*")
+            print()
+            break
+
+        elif user_ans == ans:
             print("You got it right")
             print()
             points += 100
+        
         else:
             print("WRONG")
             print()
@@ -206,9 +235,10 @@ while play_again == "yes":
             print()
             points -= 10
         rounds_played += 1
+        max_points += 100
 
     # shows final score
-    statement_generator("Final Score: {}".format(points), "|", "*")
+    statement_generator("Final Score: {} / {}".format(points, max_points), "|", "*")
     print()
 
     # asks user if they want to play again
