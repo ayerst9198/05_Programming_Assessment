@@ -9,10 +9,10 @@ def instructions():
     print("This is a randomly generated math quiz.")
     print()
     print("There are 4 difficulties:")
-    print("-easy (e)")
-    print("-medium (m)")
-    print("-hard (h). Divisions in hard mode are rounded to nearest whole number.")
-    print("-nightmare (n) *The calculator cannot save you, The decimals are too long.")
+    print("- easy (e)")
+    print("- medium (m)")
+    print("- hard (h). Divisions in hard mode are rounded to nearest whole number.")
+    print("- nightmare (n) *The calculator cannot save you, The decimals are too long.")
     print()
     print("Try to answer as many questions as possible.")
     print("Every correct answer gets you 100 points,")
@@ -39,26 +39,6 @@ def yes_no(question):
         else:
             print("<error> Unknown Answer "
                   "Detected. Please Input Yes/No")
-
-# allows the user to choose a difficulty
-def quiz_difficulty(question, valid_list, error):
-    valid = False
-    while not valid:
-
-        # Ask user for choice (and put choice in lowercase)
-        response = input(question).lower()
-
-        # iterates through list and if response is an item
-        # in the list (or the first letter of an iten), the
-        # full item name is returned
-
-        for item in valid_list:
-            if response == item[0] or response == item:
-                return item
-
-        # output error if item not in list
-        print(error)
-        print()
 
 # makes things look good
 def statement_generator(statement, side_decoration, top_bottom_decoration):
@@ -123,6 +103,27 @@ def num_check(question, num_type, error, low=None, high=None, exit_code=None):
             print(error)
             print()
 
+# confines user answer to set words
+def choice_checker(question, valid_list, error):
+
+    valid = False
+    while not valid:
+
+        # Ask user for choice (and put choice in lowercase)
+        response = input(question).lower()
+
+        # iterates through list and if response is an item
+        # in the list (or the first letter of an iten), the
+        # full item name is returned
+
+        for item in valid_list:
+            if response == item[0] or response == item:
+                return item
+
+        # output error if item not in list
+        print(error)
+        print()
+
 # Main routine goes here
 
 # randomly generated operatives, depending on which mode user is playing
@@ -131,11 +132,18 @@ medium_questions = ["*"]
 hard_questions = ["*", "/"]
 nightmare_questions = ["/", "**"]
 
-# loops code
+# lists for game statistics
+game_summary = []
+
+questions_lost = 0
+questions_won = 0
+
+# thing for loop
 play_again = "yes"
 
+# list for difficulty
+difficulty_options = ["easy", "e", "medium", "m", "hard", "h", "nightmare", "n"]
 
-difficulty_options = ["easy", "e", "medium", "", "hard", "h", "nightmare", "n"]
 # Welcomes users to the game
 statement_generator("Welcome to the Math Quiz", "|", "-")
 print()
@@ -150,56 +158,50 @@ if show_instructions == "no":
 while play_again == "yes":
 
     # keeps track of how many rounds you've played
-    rounds_played = 1
+    questions_played = 0
 
     # keeps track of points
     points = 0
     max_points = 0
 
     # asks user for a difficulty
-    difficulty = quiz_difficulty("What difficulty do you want to use? easy (e), medium (m), hard (h), nightmare (n) ", difficulty_options, "please enter easy (e), medium (m), hard (h), nightmare (n) ")
+    game_difficulty = choice_checker("What difficulty do you want to use? easy (e), medium (m), hard (h), nightmare (n) ", difficulty_options,"Please enter e (easy), m (medium), h (hard), or n (nightmare)")
     print()
 
     # decides how many rounds you can play
-    rounds = num_check("How many questions do you want to answer? ", int, "Please enter an int above 0", 1)
+    questions = num_check("How many questions do you want to answer? ", int, "Please enter an int above 0", 1)
     print()
 
     # loops untill user has played all rounds
-    while rounds + 1 != rounds_played:
-        statement_generator("Question: {}".format(rounds_played), "*" ,"*")
+    while questions != questions_played:
+        statement_generator("Question: {}".format(questions_played + 1), "*" ,"*")
 
         # randomly generates integers for math questions
-        if difficulty == "easy" or difficulty == "medium" or difficulty == "hard" or difficulty == "nightmare":
+        if game_difficulty == "easy" or game_difficulty == "medium" or game_difficulty == "hard":
             rand = random.randint(1,10)
             rand2 = random.randint(1,10)
 
-            if difficulty == "easy":
+            if game_difficulty == "easy":
                 operation = random.choice(easy_questions)
-                if operation == "-":
-                    temp_num = random.randint(1, 10)
-                    rand = rand2 + temp_num
-                else:
-                    rand = random.randint(1,10)
-                    rand2 = random.randint(1,10)
 
-            elif difficulty == "medium":
+            elif game_difficulty == "medium":
                 operation = random.choice(medium_questions)
 
             elif operation == "hard":
                 operation = random.choice(hard_questions)
-
+                
                 if operation == "/":
                     rand2 = random.randint(1,10)
                     temp_num = random.randint(1,10)
                     rand = rand2 * temp_num
-                    
                 else:
                     rand = random.randint(-10,10)
                     rand2 = random.randint(1,10)
-            else:
-                rand = random.randint(1,100)
-                rand2 = random.randint(1,30)
-                operation = random.choice(nightmare_questions)
+
+        if game_difficulty == "nightmare":
+            rand = random.randint(1,100)
+            rand2 = random.randint(1,30)
+            operation = random.choice(nightmare_questions)
 
         # generates ans using the randomly generated stuff above
         ans = eval(str(rand) + operation + str(rand2))
@@ -226,23 +228,52 @@ while play_again == "yes":
         elif user_ans == ans:
             print("You got it right")
             print()
+            questions_won += 1
             points += 100
+            result = "win"
         
         else:
             print("WRONG")
             print()
             print("The answer is: {}".format(ans))
             print()
+            result = "lose"
             points -= 10
-        rounds_played += 1
+            questions_lost += 1
+
+        questions_played += 1
         max_points += 100
+        game_summary.append("Question #{}: {}".format(questions_played, result))
 
     # shows final score
     statement_generator("Final Score: {} / {}".format(points, max_points), "|", "*")
     print()
+
+    show_history = yes_no("would you like to see game history? ")
+
+    if show_history == "yes":
+        # **** Calculate Game Stats ****
+        percent_win = questions_won / questions_played * 100
+        percent_lose = questions_lost / questions_played * 100
+
+        # shows statistics
+        print()
+        print("**** Game History ****")
+        for game in game_summary:
+            print(game)
+        print()
+        print()
+        print("**** Game Statistics ****")
+        print()
+        print("Win: {}: ({:.0f}%)\nLoss: {}: ({:.0f}%)".format(questions_won, percent_win, questions_lost, percent_lose))
+        print()
 
     # asks user if they want to play again
     play_again = yes_no("Do you want to play again? ")
 print()
 print("See you next time")
 print()
+
+
+# Fix Addition (no negative numbers)
+# Fix Game stats (percentage is wrong)
