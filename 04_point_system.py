@@ -2,15 +2,21 @@ points = 0
 while 1 == 1:
     rounds = 5
     while rounds != 0:
-        result = input("Win or lose? ")
+        result = input("correct or incorrect? ")
         print()
 
-        if result == "win":
+        if result == "correct":
+            print("+100 points")
             points += 100
-        elif result == "lose":
+            print()
+            print("Score: {}".format(points))
+        elif result == "incorrect":
+            print("-10 point")
             points -= 10
+            print()
+            print("Score: {}".format(points))
         else:
-            print("please enter win or lose")
+            print("please enter correct or incorrect")
             print()
             continue
         rounds -= 1

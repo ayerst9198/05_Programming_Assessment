@@ -183,6 +183,11 @@ while play_again == "yes":
 
             if game_difficulty == "easy":
                 operation = random.choice(easy_questions)
+                
+                if operation == "-":
+                    rand2 = random.randint(1, 10)
+                    temp_rand = random.randint(1, 10)
+                    rand = rand2 + temp_rand
 
             elif game_difficulty == "medium":
                 operation = random.choice(medium_questions)
@@ -192,8 +197,8 @@ while play_again == "yes":
                 
                 if operation == "/":
                     rand2 = random.randint(1,10)
-                    temp_num = random.randint(1,10)
-                    rand = rand2 * temp_num
+                    temp_rand = random.randint(1,10)
+                    rand = rand2 * temp_rand
                 else:
                     rand = random.randint(-10,10)
                     rand2 = random.randint(1,10)
@@ -230,14 +235,14 @@ while play_again == "yes":
             print()
             questions_won += 1
             points += 100
-            result = "win"
+            result = "correct"
         
         else:
             print("WRONG")
             print()
             print("The answer is: {}".format(ans))
             print()
-            result = "lose"
+            result = "incorrect"
             points -= 10
             questions_lost += 1
 
@@ -258,14 +263,12 @@ while play_again == "yes":
 
         # shows statistics
         print()
-        print("**** Game History ****")
+        statement_generator("Game History", "|", "*")
         for game in game_summary:
             print(game)
         print()
-        print()
-        print("**** Game Statistics ****")
-        print()
-        print("Win: {}: ({:.0f}%)\nLoss: {}: ({:.0f}%)".format(questions_won, percent_win, questions_lost, percent_lose))
+        statement_generator("Game Statistics", "%", "-")
+        print("Correct: {}: ({:.0f}%)\nIncorrect: {}: ({:.0f}%)".format(questions_won, percent_win, questions_lost, percent_lose))
         print()
 
     # asks user if they want to play again
@@ -276,4 +279,3 @@ print()
 
 
 # Fix Addition (no negative numbers)
-# Fix Game stats (percentage is wrong)
