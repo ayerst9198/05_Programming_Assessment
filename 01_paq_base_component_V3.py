@@ -132,6 +132,9 @@ medium_questions = ["*"]
 hard_questions = ["*", "/"]
 nightmare_questions = ["/", "**"]
 
+# Result for if the user quits before doing anything
+result = "You Quit"
+
 # lists for game statistics
 game_summary = []
 
@@ -217,9 +220,6 @@ while play_again == "yes":
             operation = "^"
 
 
-        # prints answer for testing
-        print("ans: {}".format(ans))
-        print()
         user_ans = num_check("What is {} {} {}? ".format(rand, operation ,rand2), float, "Please enter an integer", None, None, exit_code = "xxx")
         
         print()
@@ -257,19 +257,24 @@ while play_again == "yes":
     show_history = yes_no("would you like to see game history? ")
 
     if show_history == "yes":
-        # **** Calculate Game Stats ****
-        percent_win = questions_won / questions_played * 100
-        percent_lose = questions_lost / questions_played * 100
+        if result == "You Quit":
+            print()
+            print("Question 1: {}".format(result))
+            print()
+        else:
+            # **** Calculate Game Stats ****
+            percent_win = questions_won / questions_played * 100
+            percent_lose = questions_lost / questions_played * 100
 
-        # shows statistics
-        print()
-        statement_generator("Game History", "|", "*")
-        for game in game_summary:
-            print(game)
-        print()
-        statement_generator("Game Statistics", "%", "-")
-        print("Correct: {}: ({:.0f}%)\nIncorrect: {}: ({:.0f}%)".format(questions_won, percent_win, questions_lost, percent_lose))
-        print()
+            # shows statistics
+            print()
+            statement_generator("Game History", "|", "*")
+            for game in game_summary:
+                print(game)
+            print()
+            statement_generator("Game Statistics", "%", "-")
+            print("Correct: {}: ({:.0f}%)\nIncorrect: {}: ({:.0f}%)".format(questions_won, percent_win, questions_lost, percent_lose))
+            print()
 
     # asks user if they want to play again
     play_again = yes_no("Do you want to play again? ")
