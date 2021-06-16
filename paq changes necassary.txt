@@ -1,5 +1,5 @@
-- String checker gold slide
-- expected value slide for easy mode 
+- String checker gold slide - DONE
+- expected value slide for easy mode - DONE
 - edit slide 15(ish), add gold slide showing trialling and iteration for scoring system - DONE
 - test plan for question generation (how would you test this - are you sure it does what you want for each question type).   At what point did you decide to make nightmare mode? <goes after slide 17'ish> - DONE
-- fix issues if user tries to quit without answering any questions (either force them to answer at least one question or use an alternate strategy).
+- fix issues if user tries to quit without answering any questions (either force them to answer at least one question or use an alternate strategy). - DONE
