@@ -274,6 +274,7 @@ while play_again == "yes":
             print()
 
     # asks user if they want to play again
+    game_summary = []
     play_again = choice_checker("Do you want to use the quiz again? ", yes_no, "Please enter yes or no")
 print()
 print("See you next time")
