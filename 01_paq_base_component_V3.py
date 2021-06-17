@@ -4,6 +4,7 @@ import random
 
 # the instructions for the game are stored here
 def instructions():
+    # prints instructions
     statement_generator("Instructions", "|", "?")
     print()
     print("This is a randomly generated math quiz.")
@@ -22,35 +23,18 @@ def instructions():
     print()
     return ""
 
-# confines the users answer to yes or no
-def yes_no(question):
-    valid = False
-    while not valid:
-        response = input(question).lower()
-
-        if response == "yes" or response == "y":
-            response = "yes"
-            return response
-
-        elif response == "no" or response == "n":
-            response = "no"
-            return response
-
-        else:
-            print("<error> Unknown Answer "
-                  "Detected. Please Input Yes/No")
-
 # makes things look good
 def statement_generator(statement, side_decoration, top_bottom_decoration):
 
-
+    # makes the deco on the sides 3 times length
     sides = side_decoration * 3
-
+    # makes the final mid part of the statement, with sides attatched
     statement = "{} {} {}".format(sides, statement, sides)
 
+    # makes the deco on tope the length of the statement with the sides
     top_bottom = top_bottom_decoration * len(statement)
 
-
+    # prints the statement with all the deco, in the correct order
     print(top_bottom)
     print(statement)
     print(top_bottom)
@@ -63,15 +47,18 @@ def num_check(question, num_type, error, low=None, high=None, exit_code=None):
     valid = False
     while not valid:
         try:
+            # gets the user to input something
             response = input(question).lower()
 
-
+            # if the response is the same as the exit code, it closes the funtion, skipping the error.
             if response == exit_code:
                 return response
 
+            # makes sure response is a number
             else:
                 response = num_type(response)
- 
+
+            # IF there is a min and max number, make sure it is within the boundaries
             if low is not None and high is not None:
                 if low <= response <= high:
                     return response
@@ -79,7 +66,8 @@ def num_check(question, num_type, error, low=None, high=None, exit_code=None):
                     print(error)
                     print()
                     continue
-
+            
+            # if there is a minimum number, make sure it is above the minimum
             elif low is not None:
                 if response >= low:
                     return response
@@ -87,7 +75,7 @@ def num_check(question, num_type, error, low=None, high=None, exit_code=None):
                     print(error)
                     print()
                     continue
-
+            # if there is a max number, make sure it is below the max
             elif high is not None:
                 if response <= high:
                     return response
@@ -95,10 +83,11 @@ def num_check(question, num_type, error, low=None, high=None, exit_code=None):
                     print(error)
                     print()
                     continue
-
+            # otherwise accept the response
             else:
                 return response
-
+            
+        # if the result is not the exit code or a number, it prints error
         except ValueError:
             print(error)
             print()
@@ -131,6 +120,7 @@ easy_questions = ["+", "-"]
 medium_questions = ["*"]
 hard_questions = ["*", "/"]
 nightmare_questions = ["/", "**"]
+yes_no = ["yes", "no"]
 
 # Result for if the user quits before doing anything
 result = "You Quit"
@@ -145,14 +135,14 @@ questions_won = 0
 play_again = "yes"
 
 # list for difficulty
-difficulty_options = ["easy", "e", "medium", "m", "hard", "h", "nightmare", "n"]
+difficulty_options = ["easy", "medium", "hard", "nightmare"]
 
 # Welcomes users to the game
 statement_generator("Welcome to the Math Quiz", "|", "-")
 print()
 
 # asks user if they have played before for instructions
-show_instructions = yes_no("Have you used this quiz before? ")
+show_instructions = choice_checker("Have you used this quiz before? ", yes_no, "Please enter yes or no")
 print()
 if show_instructions == "no":
     instructions()
@@ -168,7 +158,7 @@ while play_again == "yes":
     max_points = 0
 
     # asks user for a difficulty
-    game_difficulty = choice_checker("What difficulty do you want to use? easy (e), medium (m), hard (h), nightmare (n) ", difficulty_options,"Please enter e (easy), m (medium), h (hard), or n (nightmare)")
+    quiz_difficulty = choice_checker("What difficulty do you want to use? easy (e), medium (m), hard (h), nightmare (n) ", difficulty_options,"Please enter e (easy), m (medium), h (hard), or n (nightmare)")
     print()
 
     # decides how many rounds you can play
@@ -180,48 +170,47 @@ while play_again == "yes":
         statement_generator("Question: {}".format(questions_played + 1), "*" ,"*")
 
         # randomly generates integers for math questions
-        if game_difficulty == "easy" or game_difficulty == "medium" or game_difficulty == "hard":
+        if quiz_difficulty != "nightmare":
             rand = random.randint(1,10)
             rand2 = random.randint(1,10)
 
-            if game_difficulty == "easy":
+            # changes operation depending of difficulty
+            if quiz_difficulty == "easy":
                 operation = random.choice(easy_questions)
-                
-                if operation == "-":
-                    rand2 = random.randint(1, 10)
-                    temp_rand = random.randint(1, 10)
-                    rand = rand2 + temp_rand
-
-            elif game_difficulty == "medium":
+            elif quiz_difficulty == "medium":
                 operation = random.choice(medium_questions)
+            elif quiz_difficulty == "hard":
+                operation = random.choice(hard_questions)   
 
-            elif operation == "hard":
-                operation = random.choice(hard_questions)
-                
-                if operation == "/":
-                    rand2 = random.randint(1,10)
-                    temp_rand = random.randint(1,10)
-                    rand = rand2 * temp_rand
-                else:
-                    rand = random.randint(-10,10)
-                    rand2 = random.randint(1,10)
-
-        if game_difficulty == "nightmare":
+        # creates seperate scenario for nightmare mode
+        else:
             rand = random.randint(1,100)
             rand2 = random.randint(1,30)
             operation = random.choice(nightmare_questions)
 
+        # Changes first random number so that no negative or negative numbers appear
+        if operation == "-":
+            temp_rand = random.randint(1, 10)
+            rand = rand2 + temp_rand
+        elif operation == "/":
+            rand2 = random.randint(1,10)
+            temp_rand = random.randint(1,10)
+            rand = rand2 * temp_rand
+
         # generates ans using the randomly generated stuff above
         ans = eval(str(rand) + operation + str(rand2))
 
+        # changes how the operation looks to user so it is less confusing
         if operation == "*":
             operation = "x"
         elif operation == "**":
             operation = "^"
 
-
-        user_ans = num_check("What is {} {} {}? ".format(rand, operation ,rand2), float, "Please enter an integer", None, None, exit_code = "xxx")
-        
+        # changes between int and float depending if it is nightmare difficulty or not, for the sake of appearances in the results
+        if quiz_difficulty != "nightmare":
+            user_ans = num_check("What is {} {} {}? ".format(rand, operation ,rand2), int, "Please enter an integer", None, None, exit_code = "xxx")
+        else:
+            user_ans = num_check("What is {} {} {}? ".format(rand, operation ,rand2), float, "Please enter an number", None, None, exit_code = "xxx")
         print()
 
         # compares users answer to ans
@@ -229,7 +218,8 @@ while play_again == "yes":
             statement_generator("You Quit", "|", "*")
             print()
             break
-
+        
+        # if user gets it right, get awarded 100 points, and result is added to lists for history
         elif user_ans == ans:
             print("You got it right")
             print()
@@ -237,6 +227,7 @@ while play_again == "yes":
             points += 100
             result = "correct"
         
+        # if user gets it wrong, get deduct 10 points, and result is added to lists for history
         else:
             print("WRONG")
             print()
@@ -246,17 +237,22 @@ while play_again == "yes":
             points -= 10
             questions_lost += 1
 
+        # adds number to rounds and adds 100 points to max points 
         questions_played += 1
         max_points += 100
-        game_summary.append("Question #{}: {}".format(questions_played, result))
+        game_summary.append("Question #{}: {} {} {} = {}: {}".format(questions_played, rand, operation, rand2, user_ans, result))
 
     # shows final score
     statement_generator("Final Score: {} / {}".format(points, max_points), "|", "*")
     print()
 
-    show_history = yes_no("would you like to see game history? ")
+    # asks user if they want to see history
+    show_history = choice_checker("would you like to see quiz history? ", yes_no, "Please enter yes or no")
 
+    # if user says yes, show the history
     if show_history == "yes":
+        
+        # if the result is quit, use a different system to avoid errors
         if result == "You Quit":
             print()
             print("Question 1: {}".format(result))
@@ -268,16 +264,17 @@ while play_again == "yes":
 
             # shows statistics
             print()
-            statement_generator("Game History", "|", "*")
+            statement_generator("Quiz History", "|", "*")
             for game in game_summary:
                 print(game)
             print()
-            statement_generator("Game Statistics", "%", "-")
+            # prints the statistics
+            statement_generator("Quiz Statistics", "%", "-")
             print("Correct: {}: ({:.0f}%)\nIncorrect: {}: ({:.0f}%)".format(questions_won, percent_win, questions_lost, percent_lose))
             print()
 
     # asks user if they want to play again
-    play_again = yes_no("Do you want to play again? ")
+    play_again = choice_checker("Do you want to use the quiz again? ", yes_no, "Please enter yes or no")
 print()
 print("See you next time")
 print()
